@@ -1,18 +1,50 @@
 "use client";
 
 import React, { useState } from "react";
+import submitToModel from "../helper/gemini";
 
 function Page() {
   const [input, setInput] = useState("");
   const [chats, setChats] = useState<
-    { type: "user" | "bot"; text?: string; imageUrl?: string }[]
+    { role: "user" | "agent"; type: "text" | "image"; data: string }[]
   >([]);
+  const [loading, setLoading] = useState(false);
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (input.trim() === "") return;
-    setChats([...chats, { type: "user", text: input }]);
+    const newChats = [
+      ...chats,
+      { role: "user", type: "text", data: input }
+    ];
+    setChats(newChats);
     setInput("");
-    
+    setLoading(true);
+
+    try {
+      // Send chat history to Gemini backend
+      const response = await submitToModel(newChats);
+
+      // response is an array of { type: "text" | "image", data: string }
+      if (Array.isArray(response)) {
+        const agentChats = response.map((item) => ({
+          role: "agent",
+          type: item.type,
+          data: item.data,
+        }));
+        setChats((prev) => [...prev, ...agentChats]);
+      } else {
+        setChats((prev) => [
+          ...prev,
+          { role: "agent", type: "text", data: "Sorry, something went wrong." },
+        ]);
+      }
+    } catch (err) {
+      setChats((prev) => [
+        ...prev,
+        { role: "agent", type: "text", data: "Sorry, something went wrong." },
+      ]);
+    }
+    setLoading(false);
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -20,9 +52,16 @@ function Page() {
       const file = e.target.files[0];
       const reader = new FileReader();
       reader.onload = (event) => {
+        // Extract base64 from data URL
+        const dataUrl = event.target?.result as string;
+        const base64 = dataUrl.split(",")[1];
         setChats((prev) => [
           ...prev,
-          { type: "user", imageUrl: event.target?.result as string },
+          {
+            role: "user",
+            type: "image",
+            data: base64,
+          },
         ]);
       };
       reader.readAsDataURL(file);
@@ -55,35 +94,35 @@ function Page() {
               key={idx}
               style={{
                 margin: "8px 0",
-                textAlign: chat.type === "user" ? "right" : "left",
+                textAlign: chat.role === "user" ? "right" : "left",
               }}
             >
-              {chat.text && (
+              {chat.type === "text" && (
                 <span
                   style={{
                     display: "inline-block",
                     padding: "8px 16px",
                     borderRadius: 16,
-                    background: chat.type === "user" ? "#0070f3" : "#e0e0e0",
-                    color: chat.type === "user" ? "#fff" : "#333",
+                    background: chat.role === "user" ? "#0070f3" : "#e0e0e0",
+                    color: chat.role === "user" ? "#fff" : "#333",
                     maxWidth: "70%",
                     wordBreak: "break-word",
                   }}
                 >
-                  {chat.text}
+                  {chat.data}
                 </span>
               )}
-              {chat.imageUrl && (
+              {chat.type === "image" && (
                 <img
-                  src={chat.imageUrl}
+                  src={`data:image/png;base64,${chat.data}`}
                   alt="uploaded"
                   style={{
                     display: "inline-block",
-                    maxWidth: 200,
-                    maxHeight: 200,
+                    maxWidth: 500,
+                    maxHeight: 500,
                     borderRadius: 16,
-                    marginLeft: chat.type === "user" ? 0 : 8,
-                    marginRight: chat.type === "user" ? 8 : 0,
+                    marginLeft: chat.role === "user" ? 0 : 8,
+                    marginRight: chat.role === "user" ? 8 : 0,
                     border: "1px solid #ccc",
                     background: "#fff",
                   }}
@@ -91,9 +130,13 @@ function Page() {
               )}
             </div>
           ))}
+          {loading && (
+            <div style={{ textAlign: "left", color: "#888", margin: "8px 0" }}>
+              Gemini is typing...
+            </div>
+          )}
         </div>
 
-       
         <div
           style={{
             display: "flex",
@@ -103,7 +146,6 @@ function Page() {
             background: "#fff",
           }}
         >
-         
           <label style={{ marginRight: 8, cursor: "pointer" }}>
             <input
               type="file"
@@ -116,7 +158,6 @@ function Page() {
             </span>
           </label>
 
-           
           <input
             type="text"
             value={input}
@@ -133,9 +174,9 @@ function Page() {
             onKeyDown={(e) => {
               if (e.key === "Enter") handleSend();
             }}
+            disabled={loading}
           />
 
-          {/* Send Button */}
           <button
             onClick={handleSend}
             style={{
@@ -146,6 +187,7 @@ function Page() {
               border: "none",
               cursor: "pointer",
             }}
+            disabled={loading}
           >
             Send
           </button>
