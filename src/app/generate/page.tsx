@@ -12,7 +12,7 @@ function Page() {
     if (input.trim() === "") return;
     setChats([...chats, { type: "user", text: input }]);
     setInput("");
-    // You can add bot response logic here if needed
+    
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -93,7 +93,7 @@ function Page() {
           ))}
         </div>
 
-        {/* Input Bar */}
+       
         <div
           style={{
             display: "flex",
@@ -103,7 +103,7 @@ function Page() {
             background: "#fff",
           }}
         >
-          {/* Upload Image Button */}
+         
           <label style={{ marginRight: 8, cursor: "pointer" }}>
             <input
               type="file"
@@ -116,7 +116,7 @@ function Page() {
             </span>
           </label>
 
-          {/* Text Input */}
+           
           <input
             type="text"
             value={input}
