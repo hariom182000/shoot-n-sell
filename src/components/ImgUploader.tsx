@@ -41,7 +41,7 @@ function ImgUploader({ handleFile }) {
 
   return (
     <form
-      className="relative h-64 w-96 max-w-full text-center"
+      className="relative h-64 text-center"
       onDragEnter={handleDrag}
       onSubmit={(e) => e.preventDefault()}
     >
@@ -62,7 +62,11 @@ function ImgUploader({ handleFile }) {
         }`}
       >
         <div>
-          <p className="mb-2 text-gray-500">Drag and drop your file here or</p>
+          <p className="mb-2 text-gray-500">
+            Drag and drop your product images here, or click to select files.
+            <br />
+            Supports PNG, JPG, JPEG formats.
+          </p>
           <button
             className="text-blue-600 hover:underline font-semibold bg-transparent border-none cursor-pointer"
             onClick={onButtonClick}

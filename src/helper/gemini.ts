@@ -10,16 +10,19 @@ const ai = new GoogleGenAI({ apiKey });
  */
 export async function generateImage(chat) {
   try {
-    const contents = chat
+    const contents = [{ text: IMAGE_GENERATION_PROMPT }];
+    chat
       .map((msg) =>
-        msg.type === "text"
-          ? { text: msg.data }
-          : {
-              inlineData: {
-                mimeType: "image/png",
-                data: msg.data,
-              },
-            }
+        contents.push(
+          msg.type === "text"
+            ? { text: msg.data }
+            : {
+                inlineData: {
+                  mimeType: "image/png",
+                  data: msg.data,
+                },
+              }
+        )
       )
       .filter(Boolean);
 
@@ -77,8 +80,12 @@ export async function getImageDescription(
       contents,
     });
 
-    console.log("Gemini  img description response:", response, response.candidates?.[0]?.content?.parts?.[0]?.text);
-    return response.candidates?.[0]?.content?.parts?.[0]?.text
+    console.log(
+      "Gemini  img description response:",
+      response,
+      response.candidates?.[0]?.content?.parts?.[0]?.text
+    );
+    return response.candidates?.[0]?.content?.parts?.[0]?.text;
   } catch (error) {
     console.error("Error calling Gemini API:", error);
     return null;
