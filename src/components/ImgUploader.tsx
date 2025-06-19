@@ -1,3 +1,4 @@
+import Image from "next/image";
 import React, { useRef, useState } from "react";
 
 function ImgUploader({ handleFile }) {
@@ -62,6 +63,10 @@ function ImgUploader({ handleFile }) {
         }`}
       >
         <div>
+          <div className="flex justify-center my-4">
+            <Image src="/upload.svg" alt="Icon" width={60} height={60} />
+          </div>
+
           <p className="mb-2 text-gray-500">
             Drag and drop your product images here, or click to select files.
             <br />

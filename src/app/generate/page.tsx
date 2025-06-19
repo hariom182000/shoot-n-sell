@@ -9,6 +9,7 @@ import {
   IMAGE_DESCRIPTION_PROMPT_TO_GENERATE_IMAGE,
 } from "@/helper/prompts";
 import Loader from "@/components/Loader";
+import Image from "next/image";
 
 function Page() {
   const [imgDescription, setImgDescription] = useState("");
@@ -22,8 +23,6 @@ function Page() {
     }[]
   >([]);
   const [loading, setLoading] = useState(false);
-
- 
 
   const handleSend = async () => {
     const newChats = [
@@ -95,20 +94,30 @@ function Page() {
     });
   };
 
+  const handleVideoGeneration = async () => {
+    setLoading(true);
+    try {
+    } catch (error) {
+      console.error("Error generating video:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="relative h-dvh w-full px-10 flex flex-col bg-gradient-to-b from-sky-50 to-sky-200 ">
       <div className="mt-10">
-        <text className="flex justify-center font-bold text-4xl">Upload Your Product Images</text>
+        <text className="flex justify-center font-bold text-4xl">
+          Upload Your Product Images
+        </text>
         <p className="my-2 text-gray-500 flex justify-center">
           Start by uploading your product photos. Our AI will create multiple
           professional variations.
         </p>
       </div>
 
-      {/* Blur overlay and loading spinner */}
       {loading && <Loader />}
       <div
-        
         className={`flex-1 overflow-auto transition duration-300 ${
           loading ? "blur-sm pointer-events-none select-none" : ""
         }`}
@@ -139,6 +148,38 @@ function Page() {
           </div>
         </div>
         <ImageViewer images={images} aiImages={aiImages} />
+
+        <div className="flex justify-between mt-24 rounded-md border-dashed p-4 border-2 border-gray-400 rounded-lgshadow-md">
+          <div className="flex ">
+            <div className="rounded-full mr-10 bg-gradient-to-br p-4 from-sky-400 to-purple-800">
+              <Image
+                src="/play.svg"
+                alt="Icon"
+                width={20}
+                height={20}
+                style={{ filter: "invert(100%)" }}
+              />
+            </div>
+
+            <div className="ml-10">
+              <text className="font-bold text-2xl text-sky-500 block">
+                AI Video Generation - Already Here!
+              </text>
+              <text>
+                Generate professional 4-5 second cinematic videos of your
+                products. Perfect for social media and premium e-commerce
+                listings.
+              </text>
+            </div>
+          </div>
+
+          <div
+            onClick={handleVideoGeneration}
+            className="rounded-2xl flex items-center bg-gradient-to-br px-8 from-purple-800 to-sky-400 p-4 cursor-pointer hover:from-purple-700 hover:to-sky-500 transition"
+          >
+            <text className="text-white font-medium text-center">Try Out</text>
+          </div>
+        </div>
       </div>
     </div>
   );
