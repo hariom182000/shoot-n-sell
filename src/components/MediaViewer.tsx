@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ImageCard from "./ImageCard";
 
 const TABS = [
@@ -7,10 +7,10 @@ const TABS = [
   },
   { text: "Uploaded" },
   {
-    text: "AI Generated",
+    text: "AI Image",
   },
   {
-    text: "Video",
+    text: "AI Video",
   },
 ];
 
@@ -27,6 +27,10 @@ function MediaViewer({
 }) {
   const [tabSelected, setTabSelected] = useState(tabIndex);
   const allImages = [...images, ...aiImages];
+
+  useEffect(() => {
+    setTabSelected(tabIndex);
+  }, [tabIndex]);
 
   return (
     <div className="p-4">

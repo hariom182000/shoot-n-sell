@@ -8,6 +8,8 @@ import {
   GET_VIDEO_DESCRIPTION,
   IMAGE_DESCRIPTION_PROMPT,
   IMAGE_DESCRIPTION_PROMPT_TO_GENERATE_IMAGE,
+  IMAGE_GENERATION_PROMPT,
+  IMAGE_WATER_MARK_EDIT_PROMT,
   VIDEO_GENERATION_SYSTEM_PROMPT,
 } from "@/helper/prompts";
 import Loader from "@/components/Loader";
@@ -59,8 +61,38 @@ function Page() {
   const [videoData, setVideoData] = useState<[]>([]);
   const [modelImgDes, setModelImgDes] = useState<string>();
   const [imgDescription, setImgDescription] = useState<string>();
-
+  const [isWaterMarkFlag, setIsWaterMarkFlag] = useState(false);
   const [currentTab, setCurrentTab] = useState(0);
+
+  const handleWaterMarkFlow = async () => {
+    try {
+      const imageGenChat = [
+        { role: "system", type: "text", data: "user image" },
+        { role: "user", type: "image", data: aiImages[0] },
+        { role: "system", type: "text", data: "waterMark image" },
+        {
+          role: "user",
+          type: "image",
+          data: images[images.length - 1],
+        },
+      ];
+      const response = await generateImage(
+        imageGenChat,
+        IMAGE_WATER_MARK_EDIT_PROMT
+      );
+      response.map((item) => {
+        if (item.type === "image") {
+          setAiImages((prev) => [...prev, item?.data]);
+        }
+      });
+      setCurrentTab(2);
+    } catch (err) {
+      console.log("error with watera mark flow", err);
+    } finally {
+      setIsWaterMarkFlag(false);
+      setLoading(false);
+    }
+  };
 
   const handleSend = async () => {
     const newChats = [
@@ -68,7 +100,11 @@ function Page() {
       //   { role: "user", type: "text", data: imgDescription },
     ];
     setLoading(true);
+    if (isWaterMarkFlag == true) {
+      await handleWaterMarkFlow();
 
+      return;
+    }
     try {
       // Send chat history to Gemini backend
       const modelImgDescription = await getImageDescription(
@@ -79,14 +115,17 @@ function Page() {
       setModelImgDes(modelImgDescription);
       const modelPromptForPhotoshoot = await getImageDescription(
         images,
-        [imgDescription,modelImgDescription],
+        [imgDescription, modelImgDescription],
         IMAGE_DESCRIPTION_PROMPT_TO_GENERATE_IMAGE
       );
       const imageGenChat = [
         { role: "user", type: "image", data: images[images.length - 1] },
         { role: "system", type: "text", data: modelPromptForPhotoshoot },
       ];
-      const response = await generateImage(imageGenChat);
+      const response = await generateImage(
+        imageGenChat,
+        IMAGE_GENERATION_PROMPT
+      );
       // response is an array of { type: "text" | "image", data: string }
       if (Array.isArray(response)) {
         response.map((item) => {
@@ -105,6 +144,7 @@ function Page() {
         );
         newChats.push(...agentChats);
         setChats(newChats);
+        setImgDescription("");
         setCurrentTab(2);
       }
     } catch (err) {}
@@ -148,6 +188,7 @@ function Page() {
       console.error("Error polling video status:", err);
     }
   };
+
   const handleVideoGeneration = async () => {
     setLoading(true);
     try {
@@ -226,18 +267,48 @@ function Page() {
       >
         <div className="items-center p-4  border-b border-gray-200">
           <ImgUploader handleFile={handleImageUpload} />
+          <div className="flex justify-center my-4 rounded-full">
+            <input
+              type="text"
+              value={imgDescription}
+              onChange={(e) => setImgDescription(e.target.value)}
+              placeholder="Describe your object (optional)"
+              className="flex-1 px-4 py-2  bg-white rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-200 mr-2"
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleSend();
+              }}
+              disabled={loading}
+            />
+          </div>
 
-          <input
-            type="text"
-            value={imgDescription}
-            onChange={(e) => setImgDescription(e.target.value)}
-            placeholder="Type your message..."
-            className="flex-1 px-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-200 mr-2"
-            onKeyDown={(e) => {
-              if (e.key === "Enter") handleSend();
+          <div
+            className="flex justify-end"
+            onClick={() => {
+              aiImages.length > 0 && setIsWaterMarkFlag(true);
             }}
-            disabled={loading}
-          />
+          >
+            <div className="item-center m-2 mx-6">
+              <text className="font-extralight text-gray-400 text-center">
+                Add Water Mark
+              </text>
+            </div>
+            <div
+              className="flex rounded-2xl w-1/16 p-1 px-2"
+              style={
+                aiImages.length > 0
+                  ? isWaterMarkFlag
+                    ? { justifyContent: "end", background: "#445626" }
+                    : { justifyContent: "start", background: "#800E13" }
+                  : { background: "gray", justifyContent: "start" }
+              }
+            >
+              <div
+                className="rounded-full p-4 bg-white"
+                style={aiImages.length > 0 ? {} : { background: "silver" }}
+              ></div>
+            </div>
+          </div>
+
           <div className="flex justify-center m-8">
             <button
               onClick={handleSend}

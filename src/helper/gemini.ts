@@ -8,9 +8,9 @@ const ai = new GoogleGenAI({ apiKey });
  * Submits chat history to the Gemini model and returns an array of responses.
  * Each response is an object: { type: "text" | "image", data: string }
  */
-export async function generateImage(chat) {
+export async function generateImage(chat,system_prompt) {
   try {
-    const contents = [{ text: IMAGE_GENERATION_PROMPT }];
+    const contents = [{ text: system_prompt }];
     chat
       .map((msg) =>
         contents.push(
@@ -25,8 +25,6 @@ export async function generateImage(chat) {
         )
       )
       .filter(Boolean);
-
-    contents.push({ text: IMAGE_GENERATION_PROMPT });
     const response = await ai.models.generateContent({
       model: "gemini-2.0-flash-preview-image-generation",
       contents,
