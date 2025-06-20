@@ -3,13 +3,47 @@
 import React, { useState, useRef, useEffect } from "react";
 import { generateImage, getImageDescription } from "../../helper/gemini";
 import ImgUploader from "@/components/ImgUploader";
-import ImageViewer from "@/components/ImageViewer";
+import MediaViewer from "@/components/MediaViewer";
 import {
+  GET_VIDEO_DESCRIPTION,
   IMAGE_DESCRIPTION_PROMPT,
   IMAGE_DESCRIPTION_PROMPT_TO_GENERATE_IMAGE,
+  VIDEO_GENERATION_SYSTEM_PROMPT,
 } from "@/helper/prompts";
 import Loader from "@/components/Loader";
 import Image from "next/image";
+import {
+    getAccessToken,
+  isVeoOperationSuccessful,
+  pollVeoOperation,
+} from "@/helper/apis";
+import axios from "axios";
+
+interface VeoApiResponse {
+  name: string; // Operation ID
+}
+
+interface VeoApiError {
+  error: string;
+}
+
+interface VeoRequestData {
+  instances: {
+    prompt: string;
+    image?: {
+      bytesBase64Encoded: string;
+      mimeType: string;
+    };
+  }[];
+  parameters: {
+    storageUri?: string;
+    sampleCount: number;
+    durationSeconds?: number;
+    aspectRatio?: string;
+    personGeneration?: string;
+    enhancePrompt?: boolean;
+  };
+}
 
 function Page() {
   const [imgDescription, setImgDescription] = useState("");
@@ -23,6 +57,10 @@ function Page() {
     }[]
   >([]);
   const [loading, setLoading] = useState(false);
+  const [videoData, setVideoData] = useState<[]>([]);
+  const [modelImgDes, setModelImgDes] = useState<string>();
+
+  const [currentTab, setCurrentTab] = useState(0);
 
   const handleSend = async () => {
     const newChats = [
@@ -39,6 +77,7 @@ function Page() {
         [imgDescription],
         IMAGE_DESCRIPTION_PROMPT
       );
+      setModelImgDes(modelImgDescription);
       const modelPromptForPhotoshoot = await getImageDescription(
         images,
         [imgDescription, modelImgDescription],
@@ -67,6 +106,7 @@ function Page() {
         );
         newChats.push(...agentChats);
         setChats(newChats);
+        setCurrentTab(2);
       }
     } catch (err) {}
     setLoading(false);
@@ -94,9 +134,71 @@ function Page() {
     });
   };
 
+  const startPolling = async (operationName: string, accessToken: string) => {
+    try {
+      const result = await pollVeoOperation(operationName, accessToken);
+
+      if (isVeoOperationSuccessful(result)) {
+        const videoResponse = result.response?.videos[0];
+        if (videoResponse) {
+            setCurrentTab(3)
+          setVideoData((prev) => [...prev, videoResponse.bytesBase64Encoded]);
+        }
+      }
+    } catch (err) {
+      console.error("Error polling video status:", err);
+    }
+  };
   const handleVideoGeneration = async () => {
     setLoading(true);
     try {
+      const videoGenerationPrompt = await getImageDescription(
+        aiImages,
+        [modelImgDes],
+        GET_VIDEO_DESCRIPTION
+      );
+      const accessToken = await getAccessToken();
+      const projectId = process.env.NEXT_PUBLIC_GOOGLE_CLOUD_PROJECT_ID;
+
+      const requestData: VeoRequestData = {
+        instances: [
+          {
+            prompt:
+              VIDEO_GENERATION_SYSTEM_PROMPT + "\n" + videoGenerationPrompt,
+            image: {
+              bytesBase64Encoded: aiImages[aiImages.length - 1],
+              mimeType: "image/png",
+            },
+          },
+        ],
+        parameters: {
+          sampleCount: 1,
+          durationSeconds: 5,
+          aspectRatio: "16:9",
+          enhancePrompt: true,
+        },
+      };
+
+      const response = await axios({
+        method: "post",
+        url: `https://us-central1-aiplatform.googleapis.com/v1/projects/${projectId}/locations/us-central1/publishers/google/models/veo-2.0-generate-001:predictLongRunning`,
+        headers: {
+          "Content-Type": "application/json; charset=utf-8",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        data: requestData,
+      });
+
+      const responseData = response.data;
+      if (
+        typeof responseData === "object" &&
+        responseData !== null &&
+        "name" in responseData
+      ) {
+        const typedResponse = responseData as VeoApiResponse;
+
+        await startPolling(typedResponse.name, accessToken);
+      }
     } catch (error) {
       console.error("Error generating video:", error);
     } finally {
@@ -147,9 +249,14 @@ function Page() {
             </button>
           </div>
         </div>
-        <ImageViewer images={images} aiImages={aiImages} />
+        <MediaViewer
+          images={images}
+          aiImages={aiImages}
+          videoData={videoData}
+          tabIndex={currentTab}
+        />
 
-        <div className="flex justify-between mt-24 rounded-md border-dashed p-4 border-2 border-gray-400 rounded-lgshadow-md">
+        <div className="flex justify-between my-24 rounded-md border-dashed p-4 border-2 border-gray-400 rounded-lgshadow-md">
           <div className="flex ">
             <div className="rounded-full mr-10 bg-gradient-to-br p-4 from-sky-400 to-purple-800">
               <Image
@@ -175,7 +282,7 @@ function Page() {
 
           <div
             onClick={handleVideoGeneration}
-            className="rounded-2xl flex items-center bg-gradient-to-br px-8 from-purple-800 to-sky-400 p-4 cursor-pointer hover:from-purple-700 hover:to-sky-500 transition"
+            className="rounded-2xl flex items-center max-h-8 max-w-40 bg-gradient-to-br px-8 from-purple-800 to-sky-400 p-4 cursor-pointer hover:from-purple-700 hover:to-sky-500 transition"
           >
             <text className="text-white font-medium text-center">Try Out</text>
           </div>

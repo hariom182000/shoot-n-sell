@@ -9,16 +9,23 @@ const TABS = [
   {
     text: "AI Generated",
   },
+  {
+    text: "Video",
+  },
 ];
 
-function ImageViewer({
+function MediaViewer({
   images,
   aiImages,
+  videoData,
+  tabIndex = 0,
 }: {
   images: string[];
   aiImages: string[];
+  videoData: string[];
+  tabIndex?: number;
 }) {
-  const [tabSelected, setTabSelected] = useState(0);
+  const [tabSelected, setTabSelected] = useState(tabIndex);
   const allImages = [...images, ...aiImages];
 
   return (
@@ -33,7 +40,7 @@ function ImageViewer({
         </p>
       </div>
 
-      <div className="my-8 w-120 flex justify-between">
+      <div className="my-8 w-180 flex justify-between">
         {TABS.map((tab, idx) => {
           return (
             <div
@@ -54,7 +61,9 @@ function ImageViewer({
                   ? allImages.length
                   : idx == 1
                   ? images.length
-                  : aiImages.length}
+                  : idx == 2
+                  ? aiImages.length
+                  : videoData.length}
                 {" )"}
               </p>
             </div>
@@ -91,8 +100,23 @@ function ImageViewer({
           </div>
         </div>
       )}
+      {videoData.length > 0 && tabSelected == 3 && (
+        <div className="p-4">
+          <div className="grid grid-cols-1 gap-4">
+            {videoData.map((video, idx) => (
+              <div key={idx} className="rounded-lg shadow-md p-4 bg-white">
+                <video
+                  controls
+                  className="w-200 h-auto rounded-lg"
+                  src={`data:video/mp4;base64,${video}`}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
-export default ImageViewer;
+export default MediaViewer;

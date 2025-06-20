@@ -80,11 +80,6 @@ export async function getImageDescription(
       contents,
     });
 
-    console.log(
-      "Gemini  img description response:",
-      response,
-      response.candidates?.[0]?.content?.parts?.[0]?.text
-    );
     return response.candidates?.[0]?.content?.parts?.[0]?.text;
   } catch (error) {
     console.error("Error calling Gemini API:", error);

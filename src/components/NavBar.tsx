@@ -3,7 +3,7 @@ import React from "react";
 
 function NavBar() {
   return (
-    <header className="rounded-3xl mx-10  my-4 bg-gradient-to-r from-purple-800 via-sky-400 to-purple-950 backdrop-blur-sm dark:bg-slate-950/80 sticky top-0 z-40">
+    <header className="rounded-3xl mx-10  my-3 bg-gradient-to-r from-purple-800 via-sky-400 to-purple-950 backdrop-blur-sm dark:bg-slate-950/80 sticky top-0 z-40">
       <div className="container mx-auto h-16 flex items-center justify-between">
         <div className="flex items-center ">
           <span>
