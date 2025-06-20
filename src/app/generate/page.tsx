@@ -49,7 +49,7 @@ interface VeoRequestData {
 
 function Page() {
   const [images, setImages] = useState<[]>([]);
-  const [aiImages, setAiImages] = useState<[]>([]);
+  const [aiImages, setAiImages] = useState<[]>([""]);
   const [chats, setChats] = useState<
     {
       role: "user" | "agent" | "system";
@@ -102,7 +102,6 @@ function Page() {
     setLoading(true);
     if (isWaterMarkFlag == true) {
       await handleWaterMarkFlow();
-
       return;
     }
     try {
@@ -253,7 +252,7 @@ function Page() {
           Upload Your {isWaterMarkFlag ? "WaterMark" : "Product"} Images
         </text>
         <p className="my-2 text-gray-500 flex justify-center">
-          Start by uploading your product photos. Our AI will create multiple
+          Start by uploading your {isWaterMarkFlag ? "waterMark" : "product"} photos. Our AI will create multiple
           professional variations.
         </p>
       </div>
@@ -284,7 +283,8 @@ function Page() {
           <div
             className="flex justify-end"
             onClick={() => {
-              aiImages.length > 0 && setIsWaterMarkFlag(true);
+              console.log("hiii",aiImages)
+              aiImages.length > 0 && setIsWaterMarkFlag(!isWaterMarkFlag);
             }}
           >
             <div className="item-center m-2 mx-6">
