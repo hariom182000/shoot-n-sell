@@ -15,12 +15,12 @@ function ImageCard({ base64, idx }: { base64: string; idx: number }) {
   return (
     <div
       key={idx}
-      className="w-100 h-100 rounded-lg overflow-hidden border border-gray-200 bg-gray-50 flex items-center justify-center relative group"
+      className="w-100 h-100 rounded-lg overflow-hidden border border-gray-200 bg-gray-200 flex items-center justify-center relative group"
     >
       <img
         src={`data:image/png;base64,${base64}`}
         alt={`uploaded-${idx}`}
-        className="object-cover w-full h-full"
+        className="object-contain"
       />
       {/* Download icon, visible on hover */}
       <button

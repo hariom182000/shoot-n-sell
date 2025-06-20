@@ -206,7 +206,7 @@ function Page() {
             prompt:
               VIDEO_GENERATION_SYSTEM_PROMPT + "\n" + videoGenerationPrompt,
             image: {
-              bytesBase64Encoded: aiImages[aiImages.length - 1],
+              bytesBase64Encoded: aiImages[0],
               mimeType: "image/png",
             },
           },
@@ -221,7 +221,7 @@ function Page() {
 
       const response = await axios({
         method: "post",
-        url: `https://us-central1-aiplatform.googleapis.com/v1/projects/${projectId}/locations/us-central1/publishers/google/models/veo-3.0-generate-preview:predictLongRunning`,
+        url: `https://us-central1-aiplatform.googleapis.com/v1/projects/${projectId}/locations/us-central1/publishers/google/models/veo-2.0-generate-001:predictLongRunning`,
         headers: {
           "Content-Type": "application/json; charset=utf-8",
           Authorization: `Bearer ${accessToken}`,
@@ -250,7 +250,7 @@ function Page() {
     <div className="relative h-dvh w-full px-10 flex flex-col bg-gradient-to-b from-sky-50 to-sky-200 ">
       <div className="mt-10">
         <text className="flex justify-center font-bold text-4xl">
-          Upload Your Product Images
+          Upload Your {isWaterMarkFlag ? "WaterMark" : "Product"} Images
         </text>
         <p className="my-2 text-gray-500 flex justify-center">
           Start by uploading your product photos. Our AI will create multiple
