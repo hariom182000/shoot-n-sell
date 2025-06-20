@@ -49,7 +49,7 @@ interface VeoRequestData {
 
 function Page() {
   const [images, setImages] = useState<[]>([]);
-  const [aiImages, setAiImages] = useState<[]>([""]);
+  const [aiImages, setAiImages] = useState<[]>([]);
   const [chats, setChats] = useState<
     {
       role: "user" | "agent" | "system";
