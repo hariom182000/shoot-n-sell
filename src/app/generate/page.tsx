@@ -13,7 +13,7 @@ import {
 import Loader from "@/components/Loader";
 import Image from "next/image";
 import {
-    getAccessToken,
+  getAccessToken,
   isVeoOperationSuccessful,
   pollVeoOperation,
 } from "@/helper/apis";
@@ -46,7 +46,6 @@ interface VeoRequestData {
 }
 
 function Page() {
-  const [imgDescription, setImgDescription] = useState("");
   const [images, setImages] = useState<[]>([]);
   const [aiImages, setAiImages] = useState<[]>([]);
   const [chats, setChats] = useState<
@@ -59,6 +58,7 @@ function Page() {
   const [loading, setLoading] = useState(false);
   const [videoData, setVideoData] = useState<[]>([]);
   const [modelImgDes, setModelImgDes] = useState<string>();
+  const [imgDescription, setImgDescription] = useState<string>();
 
   const [currentTab, setCurrentTab] = useState(0);
 
@@ -67,7 +67,6 @@ function Page() {
       ...chats,
       //   { role: "user", type: "text", data: imgDescription },
     ];
-    setImgDescription("");
     setLoading(true);
 
     try {
@@ -80,7 +79,7 @@ function Page() {
       setModelImgDes(modelImgDescription);
       const modelPromptForPhotoshoot = await getImageDescription(
         images,
-        [imgDescription, modelImgDescription],
+        [imgDescription,modelImgDescription],
         IMAGE_DESCRIPTION_PROMPT_TO_GENERATE_IMAGE
       );
       const imageGenChat = [
@@ -141,7 +140,7 @@ function Page() {
       if (isVeoOperationSuccessful(result)) {
         const videoResponse = result.response?.videos[0];
         if (videoResponse) {
-            setCurrentTab(3)
+          setCurrentTab(3);
           setVideoData((prev) => [...prev, videoResponse.bytesBase64Encoded]);
         }
       }
@@ -228,17 +227,17 @@ function Page() {
         <div className="items-center p-4  border-b border-gray-200">
           <ImgUploader handleFile={handleImageUpload} />
 
-          {/* <input
-              type="text"
-              value={imgDescription}
-              onChange={(e) => setImgDescription(e.target.value)}
-              placeholder="Type your message..."
-              className="flex-1 px-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-200 mr-2"
-              onKeyDown={(e) => {
-                if (e.key === "Enter") handleSend();
-              }}
-              disabled={loading}
-            /> */}
+          <input
+            type="text"
+            value={imgDescription}
+            onChange={(e) => setImgDescription(e.target.value)}
+            placeholder="Type your message..."
+            className="flex-1 px-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-200 mr-2"
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleSend();
+            }}
+            disabled={loading}
+          />
           <div className="flex justify-center m-8">
             <button
               onClick={handleSend}
