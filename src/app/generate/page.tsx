@@ -172,7 +172,7 @@ function Page() {
         ],
         parameters: {
           sampleCount: 1,
-          durationSeconds: 5,
+          durationSeconds: 8,
           aspectRatio: "16:9",
           enhancePrompt: true,
         },
@@ -180,7 +180,7 @@ function Page() {
 
       const response = await axios({
         method: "post",
-        url: `https://us-central1-aiplatform.googleapis.com/v1/projects/${projectId}/locations/us-central1/publishers/google/models/veo-2.0-generate-001:predictLongRunning`,
+        url: `https://us-central1-aiplatform.googleapis.com/v1/projects/${projectId}/locations/us-central1/publishers/google/models/veo-3.0-generate-preview:predictLongRunning`,
         headers: {
           "Content-Type": "application/json; charset=utf-8",
           Authorization: `Bearer ${accessToken}`,

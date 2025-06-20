@@ -69,12 +69,16 @@ export async function getImageDescription(
         },
       };
     });
-    img_description.map((desc) => {
-      contents.push({ text: desc });
-    });
+
+    img_description &&
+      img_description.length > 0 &&
+      img_description.map((desc) => {
+        desc && contents.push({ text: desc });
+      });
 
     contents.push({ text: system_prompt });
 
+    console.log("contests are", contents);
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
       contents,
