@@ -246,14 +246,14 @@ function Page() {
   };
 
   return (
-    <div className="relative h-dvh w-full px-10 flex flex-col bg-gradient-to-b from-sky-50 to-sky-200 ">
+    <div className="relative h-dvh w-full px-10 flex flex-col bg-gradient-to-b from-white to-sky-200 ">
       <div className="mt-10">
         <text className="flex justify-center font-bold text-4xl">
           Upload Your {isWaterMarkFlag ? "WaterMark" : "Product"} Images
         </text>
         <p className="my-2 text-gray-500 flex justify-center">
-          Start by uploading your {isWaterMarkFlag ? "waterMark" : "product"} photos. Our AI will create multiple
-          professional variations.
+          Start by uploading your {isWaterMarkFlag ? "waterMark" : "product"}{" "}
+          photos. Our AI will create multiple professional variations.
         </p>
       </div>
 
@@ -283,13 +283,12 @@ function Page() {
           <div
             className="flex justify-end"
             onClick={() => {
-              console.log("hiii",aiImages)
               aiImages.length > 0 && setIsWaterMarkFlag(!isWaterMarkFlag);
             }}
           >
             <div className="item-center m-2 mx-6">
               <text className="font-extralight text-gray-400 text-center">
-                Add Water Mark
+                Add Water Mark on Ai Images
               </text>
             </div>
             <div
@@ -352,9 +351,9 @@ function Page() {
 
           <div
             onClick={handleVideoGeneration}
-            className="rounded-2xl flex items-center max-h-8 max-w-40 bg-gradient-to-br px-8 from-purple-800 to-sky-400 p-4 cursor-pointer hover:from-purple-700 hover:to-sky-500 transition"
+            className="rounded-2xl mt-2 hover:shadow-xl shadow-md duration-300 ease-in-out flex items-center max-h-8 max-w-40 bg-gradient-to-br px-8 from-purple-800 to-sky-400 p-4 cursor-pointer hover:from-purple-700 hover:to-sky-500 transition"
           >
-            <text className="text-white font-medium text-center">Try Out</text>
+            <text className="text-white font-medium text-center">Try Now</text>
           </div>
         </div>
       </div>

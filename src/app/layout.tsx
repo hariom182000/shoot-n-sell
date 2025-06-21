@@ -27,8 +27,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className="bg-gradient-to-b from-sky-50 to-sky-200 "
-        style={{ background: "oklch(0.977 0.013 236.62)" }}
+        className="bg-gradient-to-b from-white to-sky-200 "
+       
       >
         <NavBar />
         {children}

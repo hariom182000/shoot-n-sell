@@ -48,6 +48,7 @@ function MediaViewer({
         {TABS.map((tab, idx) => {
           return (
             <div
+              key={idx}
               className=" rounded-xl px-4 py-1 border-gray-300 border-2  bg-sky-50 font-medium hover:bg-sky-400 hover:text-white transition disabled:opacity-50"
               onClick={() => {
                 setTabSelected(idx);
@@ -87,7 +88,7 @@ function MediaViewer({
 
       {images.length > 0 && tabSelected == 1 && (
         <div className="p-4">
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 sm:grid-cols-2  gap-4">
             {images.map((base64, idx) => (
               <ImageCard key={idx} base64={base64} idx={idx} />
             ))}
@@ -97,7 +98,7 @@ function MediaViewer({
 
       {aiImages.length > 0 && tabSelected == 2 && (
         <div className="p-4">
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 sm:grid-cols-2  gap-4">
             {aiImages.map((base64, idx) => (
               <ImageCard key={idx} base64={base64} idx={idx} />
             ))}
@@ -106,7 +107,7 @@ function MediaViewer({
       )}
       {videoData.length > 0 && tabSelected == 3 && (
         <div className="p-4">
-          <div className="grid grid-cols-1 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 sm:grid-cols-2  gap-4">
             {videoData.map((video, idx) => (
               <div key={idx} className="rounded-lg shadow-md p-4 bg-white">
                 <video
